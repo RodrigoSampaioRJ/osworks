@@ -1,7 +1,7 @@
 package com.algaworks.osworks.domain.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,9 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
+import com.algaworks.osworks.domain.ValidationGroups;
 import com.algaworks.osworks.domain.model.enums.StatusOrdemServico;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
 public class OrdemServico {
@@ -20,14 +27,27 @@ public class OrdemServico {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long Id;
+	
+	@Valid
+	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class)
+	@NotNull
 	@ManyToOne
 	private Cliente cliente;
+	
 	@NotBlank
 	private String descricao;
+	
+	@NotNull
 	private BigDecimal preco;
-	private LocalDateTime dataAbertura;
-	private LocalDateTime dataFinalizacao;
+	
+	@JsonProperty(access = Access.READ_ONLY)
+	private OffsetDateTime dataAbertura;
+	
+	@JsonProperty(access = Access.READ_ONLY)
+	private OffsetDateTime dataFinalizacao;
+	
 	@Enumerated(EnumType.STRING)
+	@JsonProperty(access = Access.READ_ONLY)
 	private StatusOrdemServico status;
 	
 	
@@ -56,19 +76,18 @@ public class OrdemServico {
 	public void setPreco(BigDecimal preco) {
 		this.preco = preco;
 	}
-	public LocalDateTime getDataAbertura() {
+	public OffsetDateTime getDataAbertura() {
 		return dataAbertura;
 	}
-	public void setDataAbertura(LocalDateTime dataAbertura) {
+	public void setDataAbertura(OffsetDateTime dataAbertura) {
 		this.dataAbertura = dataAbertura;
 	}
-	public LocalDateTime getDataFechamento() {
+	public OffsetDateTime getDataFinalizacao() {
 		return dataFinalizacao;
 	}
-	public void setDataFechamento(LocalDateTime dataFinalizacao) {
+	public void setDataFinalizacao(OffsetDateTime dataFinalizacao) {
 		this.dataFinalizacao = dataFinalizacao;
 	}
-	
 	
 	public StatusOrdemServico getStatus() {
 		return status;
@@ -76,6 +95,8 @@ public class OrdemServico {
 	public void setStatus(StatusOrdemServico status) {
 		this.status = status;
 	}
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
